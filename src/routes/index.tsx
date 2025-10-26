@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { App } from '../App';
 import { PrescriptionTable } from '../components/PrescriptionTable';
 import type { PrescriptionEntry } from '../types/prescription';
@@ -14,6 +14,14 @@ export default function Index() {
   const [practitionerInitials] = useState('VN');
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Handle initial load
+  useEffect(() => {
+    // Small delay to ensure smooth loading
+    const timer = setTimeout(() => setIsLoading(false), 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleUpdatePrescription = (entry: PrescriptionEntry) => {
     setPrescriptions((prev) => {
@@ -90,25 +98,43 @@ export default function Index() {
   const startNum = (currentPage - 1) * 25 + 1;
   const endNum = currentPage * 25;
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <App title="NHS Dental Prescription Tracker">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-50 to-yellow-50">
+          <div className="text-center">
+            <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-teal-600 border-r-transparent"></div>
+            <p className="mt-4 text-teal-700 font-semibold">Loading NHS Prescription Tracker...</p>
+          </div>
+        </div>
+      </App>
+    );
+  }
+
   return (
     <App title="NHS Dental Prescription Tracker">
       <div className="min-h-screen flex flex-col bg-gradient-to-br from-teal-50 to-yellow-50">
         {/* Header */}
         <header className="bg-gradient-to-r from-teal-700 to-teal-600 text-white shadow-lg">
           <div className="max-w-7xl mx-auto px-4 py-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
-                <h1 className="text-4xl font-bold mb-2">NHS Prescription Tracker</h1>
-                <p className="text-teal-100 text-lg">Dental Practice Management System</p>
+                <h1 className="text-2xl md:text-4xl font-bold mb-1 md:mb-2">NHS Prescription Tracker</h1>
+                <p className="text-teal-100 text-sm md:text-lg">Dental Practice Management System</p>
               </div>
-              <div className="mt-4 md:mt-0 bg-white/10 backdrop-blur-sm rounded-lg px-6 py-4">
-                <div className="text-sm text-teal-100 mb-2">Prescription Pad #</div>
+              <div className="mt-4 md:mt-0 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3 md:px-6 md:py-4">
+                <label htmlFor="padNumber" className="text-xs md:text-sm text-teal-100 mb-1 block">
+                  Prescription Pad #
+                </label>
                 <input
+                  id="padNumber"
                   type="number"
                   value={padNumber}
                   onChange={(e) => setPadNumber(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="text-5xl font-bold bg-transparent text-white border-b-2 border-white/30 focus:border-white focus:outline-none w-32 text-center"
+                  className="text-3xl md:text-5xl font-bold bg-white/20 text-white border-2 border-white/40 focus:border-yellow-400 focus:outline-none w-24 md:w-32 text-center rounded px-2 py-1"
                   min="1"
+                  placeholder="1"
                 />
               </div>
             </div>
@@ -195,10 +221,10 @@ export default function Index() {
           </div>
 
           {/* Pagination Controls */}
-          <div className="flex justify-center gap-2 mb-4">
+          <div className="flex flex-col sm:flex-row justify-center gap-2 mb-4">
             <button
               onClick={() => setCurrentPage(1)}
-              className={`px-6 py-2 rounded-lg font-semibold transition-all ${
+              className={`px-4 sm:px-6 py-2 rounded-lg font-semibold transition-all text-sm sm:text-base ${
                 currentPage === 1
                   ? 'bg-teal-600 text-white shadow-md'
                   : 'bg-white text-teal-600 border-2 border-teal-600 hover:bg-teal-50'
@@ -208,7 +234,7 @@ export default function Index() {
             </button>
             <button
               onClick={() => setCurrentPage(2)}
-              className={`px-6 py-2 rounded-lg font-semibold transition-all ${
+              className={`px-4 sm:px-6 py-2 rounded-lg font-semibold transition-all text-sm sm:text-base ${
                 currentPage === 2
                   ? 'bg-teal-600 text-white shadow-md'
                   : 'bg-white text-teal-600 border-2 border-teal-600 hover:bg-teal-50'
@@ -220,14 +246,16 @@ export default function Index() {
 
           {/* Prescription Table */}
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-            <PrescriptionTable
-              prescriptions={prescriptions}
-              surgeryNumber={surgeryNumber}
-              practitionerInitials={practitionerInitials}
-              onUpdatePrescription={handleUpdatePrescription}
-              startNum={startNum}
-              endNum={endNum}
-            />
+            <div className="overflow-x-auto">
+              <PrescriptionTable
+                prescriptions={prescriptions}
+                surgeryNumber={surgeryNumber}
+                practitionerInitials={practitionerInitials}
+                onUpdatePrescription={handleUpdatePrescription}
+                startNum={startNum}
+                endNum={endNum}
+              />
+            </div>
           </div>
         </main>
 

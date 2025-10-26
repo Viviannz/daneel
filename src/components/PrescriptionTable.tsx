@@ -49,8 +49,8 @@ export function PrescriptionTable({
   };
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full border-collapse border border-gray-300">
+    <div className="w-full">
+      <table className="w-full min-w-[800px] border-collapse border border-gray-300">
         <thead className="bg-teal-700 text-white sticky top-0">
           <tr>
             <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold">
