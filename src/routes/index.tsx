@@ -102,8 +102,14 @@ export default function Index() {
                 <p className="text-teal-100 text-lg">Dental Practice Management System</p>
               </div>
               <div className="mt-4 md:mt-0 bg-white/10 backdrop-blur-sm rounded-lg px-6 py-4">
-                <div className="text-sm text-teal-100 mb-1">Prescription Pad</div>
-                <div className="text-5xl font-bold">#{padNumber}</div>
+                <div className="text-sm text-teal-100 mb-2">Prescription Pad #</div>
+                <input
+                  type="number"
+                  value={padNumber}
+                  onChange={(e) => setPadNumber(Math.max(1, parseInt(e.target.value) || 1))}
+                  className="text-5xl font-bold bg-transparent text-white border-b-2 border-white/30 focus:border-white focus:outline-none w-32 text-center"
+                  min="1"
+                />
               </div>
             </div>
             <div className="mt-4 flex flex-wrap gap-4 text-sm">
@@ -280,7 +286,7 @@ export default function Index() {
                   rel="noopener noreferrer"
                   className="inline-flex items-center bg-yellow-500 text-teal-900 px-4 py-2 rounded-lg font-bold hover:bg-yellow-400 transition-all"
                 >
-                  AI4THIS.com
+                  Ai4THIS.com
                 </a>
               </div>
             </div>
