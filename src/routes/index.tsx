@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { App } from '../App';
-import { PrescriptionPadGrid } from '../components/PrescriptionPadGrid';
-import { PrescriptionForm } from '../components/PrescriptionForm';
+import { PrescriptionTable } from '../components/PrescriptionTable';
 import type { PrescriptionEntry } from '../types/prescription';
 import { generatePDF, downloadPDF } from '../utils/pdfGenerator';
 
@@ -10,19 +9,17 @@ export default function Index() {
   const [prescriptions, setPrescriptions] = useState<Map<number, PrescriptionEntry>>(
     new Map()
   );
-  const [selectedPrescription, setSelectedPrescription] = useState<number | null>(
-    null
-  );
   const [practitionerName, setPractitionerName] = useState('Dr. Vivian');
+  const [surgeryNumber] = useState('Surgery 2');
+  const [practitionerInitials] = useState('VN');
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const handleSavePrescription = (entry: PrescriptionEntry) => {
+  const handleUpdatePrescription = (entry: PrescriptionEntry) => {
     setPrescriptions((prev) => {
       const newMap = new Map(prev);
       newMap.set(entry.prescriptionNumber, entry);
       return newMap;
     });
-    setSelectedPrescription(null);
   };
 
   const handleGenerateReport = () => {
@@ -90,101 +87,89 @@ export default function Index() {
 
   return (
     <App title="NHS Dental Prescription Tracker">
-      <main className="bg-white md:rounded-lg md:shadow-md p-6 w-full h-full overflow-y-auto">
+      <main className="bg-white w-full min-h-screen p-4">
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-blue-900 mb-2">
-            NHS Dental Prescription Tracker
-          </h1>
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="mb-6 max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Practitioner Name
-              </label>
-              <input
-                type="text"
-                value={practitionerName}
-                onChange={(e) => setPractitionerName(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., Dr. Smith"
-              />
+              <h1 className="text-3xl font-bold text-blue-900">
+                NHS Dental Prescription Tracker
+              </h1>
+              <div className="flex gap-6 mt-2 text-sm text-gray-600">
+                <div>
+                  <span className="font-medium">Practitioner:</span> {practitionerName}
+                </div>
+                <div>
+                  <span className="font-medium">Surgery:</span> {surgeryNumber}
+                </div>
+                <div>
+                  <span className="font-medium">Initials:</span> {practitionerInitials}
+                </div>
+              </div>
             </div>
             <div className="text-right">
               <div className="text-sm text-gray-600">Prescription Pad</div>
-              <div className="text-3xl font-bold text-blue-900">#{padNumber}</div>
+              <div className="text-4xl font-bold text-blue-900">#{padNumber}</div>
             </div>
           </div>
+
+          {/* Progress Bar */}
+          <div className="mb-4">
+            <div className="flex justify-between text-sm text-gray-600 mb-2">
+              <span>Progress</span>
+              <span>
+                {filledCount} / 50 prescriptions ({progress.toFixed(0)}%)
+              </span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-3">
+              <div
+                className="bg-blue-600 h-3 rounded-full transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 mb-6">
+            <button
+              onClick={handleGenerateReport}
+              disabled={filledCount === 0 || isGenerating}
+              className="flex-1 bg-green-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+            >
+              {isGenerating ? 'Generating...' : 'Generate Report & Email PDF'}
+            </button>
+            <button
+              onClick={handleNewPad}
+              className="flex-1 bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-gray-700 transition-colors"
+            >
+              Start New Pad
+            </button>
+          </div>
         </div>
 
-        {/* Progress Bar */}
-        <div className="mb-6">
-          <div className="flex justify-between text-sm text-gray-600 mb-2">
-            <span>Progress</span>
-            <span>
-              {filledCount} / 50 prescriptions ({progress.toFixed(0)}%)
-            </span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-4">
-            <div
-              className="bg-blue-600 h-4 rounded-full transition-all duration-300"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Prescription Pad Grid */}
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-3">
-            Prescription Pad
-          </h2>
-          <PrescriptionPadGrid
+        {/* Prescription Table */}
+        <div className="max-w-7xl mx-auto">
+          <PrescriptionTable
             prescriptions={prescriptions}
-            onSelectPrescription={setSelectedPrescription}
+            surgeryNumber={surgeryNumber}
+            practitionerInitials={practitionerInitials}
+            onUpdatePrescription={handleUpdatePrescription}
           />
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <button
-            onClick={handleGenerateReport}
-            disabled={filledCount === 0 || isGenerating}
-            className="flex-1 bg-green-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-          >
-            {isGenerating ? 'Generating...' : 'Generate Report & Email PDF'}
-          </button>
-          <button
-            onClick={handleNewPad}
-            className="flex-1 bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-gray-700 transition-colors"
-          >
-            Start New Pad
-          </button>
         </div>
 
         {/* Info Box */}
-        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="max-w-7xl mx-auto mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
           <h3 className="font-semibold text-blue-900 mb-2">Instructions:</h3>
           <ul className="text-sm text-blue-800 space-y-1">
-            <li>• Click on any prescription number (1-50) to fill in details</li>
-            <li>
-              • Green boxes indicate completed prescriptions, white boxes are empty
-            </li>
-            <li>
-              • Generate a report when ready - it will include an audit summary
-            </li>
-            <li>• The PDF report will be downloaded and emailed automatically</li>
-            <li>• Start a new pad to reset and begin tracking pad #{padNumber + 1}</li>
+            <li>• Fill in each row directly in the table - no need to click anything!</li>
+            <li>• Date defaults to today, but you can change it</li>
+            <li>• Enter the 11-digit NHS serial number from your prescription form</li>
+            <li>• Select medication from the dropdown</li>
+            <li>• Add patient initials at the end</li>
+            <li>• Completed rows turn green automatically</li>
+            <li>• Click "Generate Report" when ready - includes audit summary</li>
           </ul>
         </div>
-
-        {/* Prescription Form Modal */}
-        {selectedPrescription !== null && (
-          <PrescriptionForm
-            prescriptionNumber={selectedPrescription}
-            onSubmit={handleSavePrescription}
-            onCancel={() => setSelectedPrescription(null)}
-            existingEntry={prescriptions.get(selectedPrescription)}
-          />
-        )}
       </main>
     </App>
   );
