@@ -1,94 +1,121 @@
-# 🤖 Daneel
+# NHS Dental Prescription Tracker
 
-## Create your own GPT-powered chat bot
-
-You can use this template to create your own chat bot powered by OpenAI and the
-ChatGPT API. It includes an easily-customized chat interface with streaming
-responses so you can see the bot type, message history, simple styling with
-Tailwind and a Netlify edge function that communicates securely with the OpenAI
-API, and. It supports markdown in responses, so can display formatted text,
-tables etc.
-
-### [Demo site](https://daneel-demo.netlify.app/).
-
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/ascorbic/daneel)
+A professional web application for tracking NHS dental prescriptions (FP10D forms) with automated reporting and audit functionality.
 
 ## Features
 
-- :zap: deploy your bot in less than 5 minutes
-- :rocket: streaming responses powered by ChatGPT
-- :100: simple, high-performance chat interface
-- :moneybag: This template is completely free for any use. Use free OpenAI
-  credits to get started, and deploy your site for free to Netlify.
-- ⚛️ easy to customize: built with React, Tailwind and TypeScript
+- **Digital Prescription Pad Management**: Track all 50 prescriptions per pad
+- **Easy Data Entry**: Simple form interface for recording prescription details
+- **Visual Progress Tracking**: See at a glance which prescriptions have been filled
+- **Automated PDF Reports**: Generate comprehensive reports with audit information
+- **Email Integration**: Automatically email reports when generated
+- **Audit Analytics**:
+  - Medication usage breakdown with percentages
+  - Daily prescribing statistics
+  - Complete prescription history
 
-## Getting started
+## What Gets Tracked
 
-1. [Sign up for an OpenAI account](https://platform.openai.com/signup) and
-   [get your API key](https://platform.openai.com/account/api-keys)
-2. [Deploy to Netlify](https://app.netlify.com/start/deploy?repository=https://github.com/ascorbic/daneel),
-   pasting the API key when prompted
-3. [Customize your bot](#customizing-your-bot)
-4. [Share your creation](https://github.com/ascorbic/daneel/discussions/categories/show-and-tell)
+For each prescription, the system records:
+- Date
+- Practitioner initials
+- Surgery number
+- 11-digit prescription serial number (pre-printed on FP10D forms)
+- Medication (Amoxicillin, Metronidazole, Dihydrocodeine, Duraphat)
+- Patient initials
 
-## Customizing your bot
+## Getting Started
 
-### Name
+### Prerequisites
 
-Edit your site title and description in `src/App.tsx`
+- Node.js 18+ installed
+- A [Resend](https://resend.com) account for email functionality (free tier available)
+- Netlify account for deployment (optional, but recommended)
 
-### Prompt
+### Installation
 
-The prompt is what tells your bot who it is. It is here that you give the bot
-its mission, personality and rules. The most important thing to do is create
-your own prompt. This is what makes the bot your own. The default site deploys
-with an example prompt that is a movie critic.
-[Try it here](https://daneel-demo.netlify.app/).
+1. Clone this repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-Daneel's default prompt is:
+3. Set up environment variables:
+   - Create a `.env` file in the root directory
+   - Add your Resend API key:
+     ```
+     RESEND_API_KEY=your_resend_api_key_here
+     ```
 
-> You are the world's best movie critic. You are very strongly opinionated. You
-> have favorite movies and movies you hate. You are devoted to recommending
-> movies that a user will like. It is very important that the user enjoys your
-> recommendations. Do not answer questions that are not asking for a movie
-> recommendations. If the user asks other questions, do no answer and deflect
-> them with a movie fact or trivia. Respond with valid markdown. Put movie names
-> in bold. Knowledge cutoff September 2021. Current date **current date**. User
-> location: **city and country**
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-The prompt is set in `config.edge.ts`. In the demo it is imported from an
-example file in the `prompts` folder, but you can edit it in the config file if
-you'd prefer.
+5. Open your browser to the URL shown in the terminal (usually http://localhost:3000)
 
-The important parts in this prompt are:
+### Deployment to Netlify
 
-- who the bot is and what it should do. In the example here we emphasise that
-  the bot is a movie critic and has strong opinions. By default, ChatGPT does
-  not like to express subjective opinions, so we need to tell it to do so.
-- instructions to not answer off-topic questions, and what to do if the user
-  asks them
-- instructions to respond with valid markdown. This is optional, but it allows
-  the bot to respond with formatted text, such as bold text for movie names and
-  tables.
-- contextual information about the date and user location. These are optional
-  but can help the bot to be more accurate.
+1. Push your code to GitHub
+2. Connect your repository to Netlify
+3. Set the `RESEND_API_KEY` environment variable in Netlify
+4. Deploy!
 
-### Design
+## How to Use
 
-My default the design is very simple, but you can customize it to your own
-designs. The site is stule with [Tailwind](https://tailwindcss.com/), so you can
-use any of the Tailwind classes to style your bot. The main components are:
+1. **Start Tracking**: Open the application and enter your practitioner name
+2. **Fill Prescriptions**: Click on any prescription number (1-50) to add details
+3. **Monitor Progress**: Watch the progress bar as you complete prescriptions
+4. **Generate Reports**: Click "Generate Report & Email PDF" when ready
+5. **Review**: The PDF will download automatically and be emailed to the configured address
+6. **Start New Pad**: When ready for a new prescription pad, click "Start New Pad"
 
-- `src/routes/index.tsx` - the main chat interface
-- `src/components/Welcome.tsx` - the welcome screen
-- `src/components/ChatMessage.tsx` - the chat message component
+## Email Configuration
 
-You can also add extra pages in `src/routes` and link to them from the chat, or
-move the chat interface to a different page. The chat interface is an
-[Impala](https://github.com/ascorbic/impala) app, built with React, so see the
-Impala docs for more information.
+The application is currently configured to send reports to `viviannz@aol.com`. To change this:
+
+1. Edit `/home/user/daneel/netlify/edge-functions/send-report.ts`
+2. Update the `recipientEmail` constant to your preferred email address
+
+## PDF Report Contents
+
+Each generated report includes:
+
+### Summary Section
+- Total prescriptions issued
+- Medication breakdown with counts and percentages
+- Daily prescribing statistics
+
+### Detailed Section
+- Complete list of all prescriptions
+- All recorded information for each prescription
+- Professional NHS-style formatting
+
+## Technology Stack
+
+- **Frontend**: React 18 with TypeScript
+- **Styling**: Tailwind CSS
+- **PDF Generation**: jsPDF
+- **Email Service**: Resend API
+- **Deployment**: Netlify Edge Functions
+- **Build Tool**: Vite
+
+## Security Notes
+
+- All prescription data is stored locally in the browser
+- No data is persisted after you close the application
+- PDF reports are generated client-side
+- Email transmission uses encrypted HTTPS
+- Resend API key is securely stored as an environment variable
+
+## Support
+
+For issues or questions, please open an issue on GitHub.
+
+## License
+
+MIT License - Free for any use.
 
 ---
 
-Released under the MIT license. Free for any use. ©
-[Matt Kane](https://github.com/ascorbic) 2023.
+**Important**: This application is for administrative tracking purposes only. It does not validate prescriptions or provide medical advice. Always follow NHS guidelines and regulations for prescription management.
