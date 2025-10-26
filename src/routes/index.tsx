@@ -13,6 +13,7 @@ export default function Index() {
   const [surgeryNumber] = useState('Surgery 2');
   const [practitionerInitials] = useState('VN');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const handleUpdatePrescription = (entry: PrescriptionEntry) => {
     setPrescriptions((prev) => {
@@ -85,47 +86,88 @@ export default function Index() {
   const filledCount = prescriptions.size;
   const progress = (filledCount / 50) * 100;
 
+  // Calculate range for current page (25 per page)
+  const startNum = (currentPage - 1) * 25 + 1;
+  const endNum = currentPage * 25;
+
   return (
     <App title="NHS Dental Prescription Tracker">
-      <main className="bg-white w-full min-h-screen p-4">
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-teal-50 to-yellow-50">
         {/* Header */}
-        <div className="mb-6 max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-            <div>
-              <h1 className="text-3xl font-bold text-blue-900">
-                NHS Dental Prescription Tracker
-              </h1>
-              <div className="flex gap-6 mt-2 text-sm text-gray-600">
-                <div>
-                  <span className="font-medium">Practitioner:</span> {practitionerName}
-                </div>
-                <div>
-                  <span className="font-medium">Surgery:</span> {surgeryNumber}
-                </div>
-                <div>
-                  <span className="font-medium">Initials:</span> {practitionerInitials}
-                </div>
+        <header className="bg-gradient-to-r from-teal-700 to-teal-600 text-white shadow-lg">
+          <div className="max-w-7xl mx-auto px-4 py-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+              <div>
+                <h1 className="text-4xl font-bold mb-2">NHS Prescription Tracker</h1>
+                <p className="text-teal-100 text-lg">Dental Practice Management System</p>
+              </div>
+              <div className="mt-4 md:mt-0 bg-white/10 backdrop-blur-sm rounded-lg px-6 py-4">
+                <div className="text-sm text-teal-100 mb-1">Prescription Pad</div>
+                <div className="text-5xl font-bold">#{padNumber}</div>
               </div>
             </div>
-            <div className="text-right">
-              <div className="text-sm text-gray-600">Prescription Pad</div>
-              <div className="text-4xl font-bold text-blue-900">#{padNumber}</div>
+            <div className="mt-4 flex flex-wrap gap-4 text-sm">
+              <div className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+                <span className="text-teal-100">Practitioner:</span>
+                <span className="ml-2 font-semibold">{practitionerName}</span>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+                <span className="text-teal-100">Surgery:</span>
+                <span className="ml-2 font-semibold">{surgeryNumber}</span>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+                <span className="text-teal-100">Initials:</span>
+                <span className="ml-2 font-semibold">{practitionerInitials}</span>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Main Content */}
+        <main className="flex-grow max-w-7xl mx-auto px-4 py-8 w-full">
+          {/* How It Works Section */}
+          <div className="bg-white rounded-xl shadow-md p-6 mb-6 border-l-4 border-teal-600">
+            <h2 className="text-2xl font-bold text-teal-900 mb-3 flex items-center">
+              <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              How It Works
+            </h2>
+            <div className="grid md:grid-cols-3 gap-4 text-sm">
+              <div className="bg-teal-50 p-4 rounded-lg">
+                <div className="font-semibold text-teal-900 mb-2">1. Fill in Prescriptions</div>
+                <p className="text-gray-700">Enter details directly in the table - date, serial number, medication, and patient initials.</p>
+              </div>
+              <div className="bg-yellow-50 p-4 rounded-lg">
+                <div className="font-semibold text-teal-900 mb-2">2. Track Progress</div>
+                <p className="text-gray-700">Watch rows turn green as you complete them. Use pagination to switch between pages.</p>
+              </div>
+              <div className="bg-teal-50 p-4 rounded-lg">
+                <div className="font-semibold text-teal-900 mb-2">3. Generate Report</div>
+                <p className="text-gray-700">Click generate to create a PDF with audit data and email it automatically.</p>
+              </div>
             </div>
           </div>
 
           {/* Progress Bar */}
-          <div className="mb-4">
+          <div className="bg-white rounded-xl shadow-md p-4 mb-6">
             <div className="flex justify-between text-sm text-gray-600 mb-2">
-              <span>Progress</span>
+              <span className="font-semibold">Progress</span>
               <span>
                 {filledCount} / 50 prescriptions ({progress.toFixed(0)}%)
               </span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-3">
+            <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
               <div
-                className="bg-blue-600 h-3 rounded-full transition-all duration-300"
+                className="bg-gradient-to-r from-teal-600 to-teal-500 h-4 rounded-full transition-all duration-300 flex items-center justify-end pr-2"
                 style={{ width: `${progress}%` }}
-              />
+              >
+                {progress > 10 && (
+                  <span className="text-xs text-white font-semibold">
+                    {progress.toFixed(0)}%
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
@@ -134,43 +176,121 @@ export default function Index() {
             <button
               onClick={handleGenerateReport}
               disabled={filledCount === 0 || isGenerating}
-              className="flex-1 bg-green-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+              className="flex-1 bg-gradient-to-r from-teal-600 to-teal-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-teal-700 hover:to-teal-600 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed transition-all shadow-md"
             >
-              {isGenerating ? 'Generating...' : 'Generate Report & Email PDF'}
+              {isGenerating ? 'Generating...' : '📄 Generate Report & Email PDF'}
             </button>
             <button
               onClick={handleNewPad}
-              className="flex-1 bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-gray-700 transition-colors"
+              className="flex-1 bg-gradient-to-r from-yellow-600 to-yellow-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-yellow-700 hover:to-yellow-600 transition-all shadow-md"
             >
-              Start New Pad
+              🔄 Start New Pad
             </button>
           </div>
-        </div>
 
-        {/* Prescription Table */}
-        <div className="max-w-7xl mx-auto">
-          <PrescriptionTable
-            prescriptions={prescriptions}
-            surgeryNumber={surgeryNumber}
-            practitionerInitials={practitionerInitials}
-            onUpdatePrescription={handleUpdatePrescription}
-          />
-        </div>
+          {/* Pagination Controls */}
+          <div className="flex justify-center gap-2 mb-4">
+            <button
+              onClick={() => setCurrentPage(1)}
+              className={`px-6 py-2 rounded-lg font-semibold transition-all ${
+                currentPage === 1
+                  ? 'bg-teal-600 text-white shadow-md'
+                  : 'bg-white text-teal-600 border-2 border-teal-600 hover:bg-teal-50'
+              }`}
+            >
+              Prescriptions 1-25
+            </button>
+            <button
+              onClick={() => setCurrentPage(2)}
+              className={`px-6 py-2 rounded-lg font-semibold transition-all ${
+                currentPage === 2
+                  ? 'bg-teal-600 text-white shadow-md'
+                  : 'bg-white text-teal-600 border-2 border-teal-600 hover:bg-teal-50'
+              }`}
+            >
+              Prescriptions 26-50
+            </button>
+          </div>
 
-        {/* Info Box */}
-        <div className="max-w-7xl mx-auto mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h3 className="font-semibold text-blue-900 mb-2">Instructions:</h3>
-          <ul className="text-sm text-blue-800 space-y-1">
-            <li>• Fill in each row directly in the table - no need to click anything!</li>
-            <li>• Date defaults to today, but you can change it</li>
-            <li>• Enter the 11-digit NHS serial number from your prescription form</li>
-            <li>• Select medication from the dropdown</li>
-            <li>• Add patient initials at the end</li>
-            <li>• Completed rows turn green automatically</li>
-            <li>• Click "Generate Report" when ready - includes audit summary</li>
-          </ul>
-        </div>
-      </main>
+          {/* Prescription Table */}
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            <PrescriptionTable
+              prescriptions={prescriptions}
+              surgeryNumber={surgeryNumber}
+              practitionerInitials={practitionerInitials}
+              onUpdatePrescription={handleUpdatePrescription}
+              startNum={startNum}
+              endNum={endNum}
+            />
+          </div>
+        </main>
+
+        {/* Footer */}
+        <footer className="bg-gradient-to-r from-teal-800 to-teal-700 text-white mt-12">
+          <div className="max-w-7xl mx-auto px-4 py-8">
+            <div className="grid md:grid-cols-4 gap-6 mb-6">
+              <div>
+                <h3 className="font-bold text-lg mb-3">NHS Prescription Tracker</h3>
+                <p className="text-teal-100 text-sm">Professional dental practice management for NHS prescriptions.</p>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-3">Legal</h4>
+                <ul className="space-y-2 text-sm text-teal-100">
+                  <li><a href="#privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                  <li><a href="#gdpr" className="hover:text-white transition-colors">GDPR Compliance</a></li>
+                  <li><a href="#terms" className="hover:text-white transition-colors">Terms of Service</a></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-3">Connect</h4>
+                <ul className="space-y-2 text-sm text-teal-100">
+                  <li>
+                    <a
+                      href="https://twitter.com/VIVIANNZ488"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-white transition-colors flex items-center"
+                    >
+                      <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"></path>
+                      </svg>
+                      Twitter Feedback
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="https://www.linkedin.com/in/dr-vivian-nzegbulem-58ab3568/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-white transition-colors flex items-center"
+                    >
+                      <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                      </svg>
+                      LinkedIn Profile
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-3">Powered By</h4>
+                <a
+                  href="https://this.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center bg-yellow-500 text-teal-900 px-4 py-2 rounded-lg font-bold hover:bg-yellow-400 transition-all"
+                >
+                  THIS.com AI
+                </a>
+              </div>
+            </div>
+            <div className="border-t border-teal-600 pt-6 text-center text-sm text-teal-200">
+              <p>© {new Date().getFullYear()} NHS Prescription Tracker. All rights reserved.</p>
+              <p className="mt-2">This tool is for administrative purposes only and does not constitute medical advice.</p>
+            </div>
+          </div>
+        </footer>
+      </div>
     </App>
   );
 }

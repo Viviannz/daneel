@@ -6,6 +6,8 @@ interface PrescriptionTableProps {
   surgeryNumber: string;
   practitionerInitials: string;
   onUpdatePrescription: (entry: PrescriptionEntry) => void;
+  startNum?: number;
+  endNum?: number;
 }
 
 const medications: Medication[] = [
@@ -20,8 +22,10 @@ export function PrescriptionTable({
   surgeryNumber,
   practitionerInitials,
   onUpdatePrescription,
+  startNum = 1,
+  endNum = 50,
 }: PrescriptionTableProps) {
-  const rows = Array.from({ length: 50 }, (_, i) => i + 1);
+  const rows = Array.from({ length: endNum - startNum + 1 }, (_, i) => startNum + i);
 
   const handleFieldChange = (
     prescriptionNumber: number,
@@ -31,11 +35,11 @@ export function PrescriptionTable({
     const existing = prescriptions.get(prescriptionNumber);
     const updated: PrescriptionEntry = {
       prescriptionNumber,
-      date: existing?.date || new Date().toISOString().split('T')[0],
+      date: existing?.date || '',
       practitionerInitials,
       surgeryNumber,
       serialNumber: existing?.serialNumber || '',
-      medication: existing?.medication || 'Amoxicillin',
+      medication: existing?.medication || '' as Medication,
       patientInitials: existing?.patientInitials || '',
       filled: true,
       ...existing,
@@ -47,7 +51,7 @@ export function PrescriptionTable({
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full border-collapse border border-gray-300">
-        <thead className="bg-blue-900 text-white sticky top-0">
+        <thead className="bg-teal-700 text-white sticky top-0">
           <tr>
             <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold">
               Date
@@ -86,11 +90,11 @@ export function PrescriptionTable({
                 <td className="border border-gray-300 px-2 py-1">
                   <input
                     type="date"
-                    value={prescription?.date || new Date().toISOString().split('T')[0]}
+                    value={prescription?.date || ''}
                     onChange={(e) =>
                       handleFieldChange(number, 'date', e.target.value)
                     }
-                    className="w-full px-2 py-1 text-sm border-0 focus:outline-none focus:ring-1 focus:ring-blue-500 rounded"
+                    className="w-full px-2 py-1 text-sm border-0 focus:outline-none focus:ring-1 focus:ring-teal-500 rounded"
                   />
                 </td>
 
@@ -117,12 +121,12 @@ export function PrescriptionTable({
                     }}
                     placeholder="11-digit number"
                     maxLength={11}
-                    className="w-full px-2 py-1 text-sm border-0 focus:outline-none focus:ring-1 focus:ring-blue-500 rounded font-mono"
+                    className="w-full px-2 py-1 text-sm border-0 focus:outline-none focus:ring-1 focus:ring-teal-500 rounded font-mono"
                   />
                 </td>
 
                 {/* Pad Number */}
-                <td className="border border-gray-300 px-3 py-2 text-sm text-center font-semibold text-blue-900">
+                <td className="border border-gray-300 px-3 py-2 text-sm text-center font-semibold text-teal-700">
                   {number}
                 </td>
 
@@ -137,7 +141,7 @@ export function PrescriptionTable({
                         e.target.value as Medication
                       )
                     }
-                    className="w-full px-2 py-1 text-sm border-0 focus:outline-none focus:ring-1 focus:ring-blue-500 rounded"
+                    className="w-full px-2 py-1 text-sm border-0 focus:outline-none focus:ring-1 focus:ring-teal-500 rounded"
                   >
                     <option value="">Select...</option>
                     {medications.map((med) => (
@@ -162,7 +166,7 @@ export function PrescriptionTable({
                     }
                     placeholder="e.g., JD"
                     maxLength={5}
-                    className="w-full px-2 py-1 text-sm border-0 focus:outline-none focus:ring-1 focus:ring-blue-500 rounded"
+                    className="w-full px-2 py-1 text-sm border-0 focus:outline-none focus:ring-1 focus:ring-teal-500 rounded"
                   />
                 </td>
               </tr>
