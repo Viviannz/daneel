@@ -275,12 +275,12 @@ export default function Index() {
               <div>
                 <h4 className="font-semibold mb-3">Powered By</h4>
                 <a
-                  href="https://this.com"
+                  href="https://ai4this.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center bg-yellow-500 text-teal-900 px-4 py-2 rounded-lg font-bold hover:bg-yellow-400 transition-all"
                 >
-                  THIS.com AI
+                  AI4THIS.com
                 </a>
               </div>
             </div>
