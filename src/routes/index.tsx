@@ -3,6 +3,7 @@ import { App } from '../App';
 import { PrescriptionTable } from '../components/PrescriptionTable';
 import type { PrescriptionEntry } from '../types/prescription';
 import { generatePDF, downloadPDF } from '../utils/pdfGenerator';
+import { generateSerialNumbers } from '../utils/serialNumberGenerator';
 
 export default function Index() {
   const [padNumber, setPadNumber] = useState(1);
@@ -15,6 +16,8 @@ export default function Index() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
+  const [firstSerialNumber, setFirstSerialNumber] = useState('');
+  const [serialNumbers, setSerialNumbers] = useState<string[]>([]);
 
   // Handle initial load
   useEffect(() => {
@@ -89,6 +92,43 @@ export default function Index() {
     }
     setPadNumber(padNumber + 1);
     setPrescriptions(new Map());
+    setFirstSerialNumber('');
+    setSerialNumbers([]);
+  };
+
+  const handleGenerateSerialNumbers = () => {
+    if (firstSerialNumber.length !== 11) {
+      alert('Please enter an 11-digit serial number');
+      return;
+    }
+
+    if (!/^\d{11}$/.test(firstSerialNumber)) {
+      alert('Serial number must contain only digits');
+      return;
+    }
+
+    try {
+      const generated = generateSerialNumbers(firstSerialNumber);
+      setSerialNumbers(generated);
+
+      // Auto-fill serial numbers into existing prescriptions
+      const updatedPrescriptions = new Map(prescriptions);
+      generated.forEach((serial, index) => {
+        const prescriptionNum = index + 1;
+        const existing = updatedPrescriptions.get(prescriptionNum);
+        if (existing) {
+          updatedPrescriptions.set(prescriptionNum, {
+            ...existing,
+            serialNumber: serial,
+          });
+        }
+      });
+      setPrescriptions(updatedPrescriptions);
+
+      alert('Serial numbers generated successfully for all 50 prescriptions!');
+    } catch (error) {
+      alert('Error generating serial numbers. Please check the first serial number.');
+    }
   };
 
   const filledCount = prescriptions.size;
@@ -203,6 +243,53 @@ export default function Index() {
             </div>
           </div>
 
+          {/* Serial Number Setup */}
+          <div className="bg-white rounded-xl shadow-md p-4 md:p-6 mb-6 border-l-4 border-yellow-500">
+            <h3 className="text-lg md:text-xl font-bold text-teal-900 mb-3">
+              🔢 Auto-Generate Serial Numbers
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Enter the serial number from prescription #1 on your pad, and we'll automatically generate all 50 serial numbers.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex-1">
+                <label htmlFor="firstSerial" className="block text-sm font-medium text-gray-700 mb-1">
+                  First Serial Number (from prescription #1)
+                </label>
+                <input
+                  id="firstSerial"
+                  type="text"
+                  value={firstSerialNumber}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '');
+                    if (value.length <= 11) {
+                      setFirstSerialNumber(value);
+                    }
+                  }}
+                  placeholder="e.g., 62689172013"
+                  maxLength={11}
+                  className="w-full px-4 py-2 text-lg border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 font-mono"
+                />
+              </div>
+              <div className="flex items-end">
+                <button
+                  onClick={handleGenerateSerialNumbers}
+                  disabled={firstSerialNumber.length !== 11}
+                  className="w-full sm:w-auto px-6 py-2 bg-yellow-600 text-white font-semibold rounded-lg hover:bg-yellow-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-md"
+                >
+                  ✨ Generate All 50
+                </button>
+              </div>
+            </div>
+            {serialNumbers.length > 0 && (
+              <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-sm text-green-800">
+                  ✅ Serial numbers generated! They're now pre-filled in the table. Example: #1 = {serialNumbers[0]}, #50 = {serialNumbers[49]}
+                </p>
+              </div>
+            )}
+          </div>
+
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 mb-6">
             <button
@@ -254,6 +341,7 @@ export default function Index() {
                 onUpdatePrescription={handleUpdatePrescription}
                 startNum={startNum}
                 endNum={endNum}
+                serialNumbers={serialNumbers}
               />
             </div>
           </div>

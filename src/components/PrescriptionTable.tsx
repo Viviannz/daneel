@@ -8,6 +8,7 @@ interface PrescriptionTableProps {
   onUpdatePrescription: (entry: PrescriptionEntry) => void;
   startNum?: number;
   endNum?: number;
+  serialNumbers?: string[];
 }
 
 const medications: Medication[] = [
@@ -24,6 +25,7 @@ export function PrescriptionTable({
   onUpdatePrescription,
   startNum = 1,
   endNum = 50,
+  serialNumbers = [],
 }: PrescriptionTableProps) {
   const rows = Array.from({ length: endNum - startNum + 1 }, (_, i) => startNum + i);
 
@@ -112,7 +114,7 @@ export function PrescriptionTable({
                 <td className="border border-gray-300 px-2 py-1">
                   <input
                     type="text"
-                    value={prescription?.serialNumber || ''}
+                    value={prescription?.serialNumber || (serialNumbers[number - 1] || '')}
                     onChange={(e) => {
                       const value = e.target.value.replace(/\D/g, '');
                       if (value.length <= 11) {
