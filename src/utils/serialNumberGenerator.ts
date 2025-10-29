@@ -5,13 +5,12 @@ export function calculateCheckDigit(first10Digits: string): string {
 
   const sum = digits.reduce((acc, digit, index) => acc + digit * weights[index], 0);
   const remainder = sum % 11;
-  const checkDigit = 11 - remainder;
 
-  // If check digit is 11, use 0; if 10, the number is invalid but we'll return 0
-  if (checkDigit === 11) return '0';
-  if (checkDigit === 10) return '0';
+  // The check digit is the remainder itself (not 11 - remainder)
+  // Special case: if remainder is 10, we use 0 (X in some systems, but 0 for NHS)
+  if (remainder === 10) return '0';
 
-  return checkDigit.toString();
+  return remainder.toString();
 }
 
 export function generateSerialNumbers(firstSerialNumber: string): string[] {
@@ -19,17 +18,16 @@ export function generateSerialNumbers(firstSerialNumber: string): string[] {
     throw new Error('Serial number must be 11 digits');
   }
 
-  const prefix = firstSerialNumber.substring(0, 7); // First 7 digits stay same
-  const startingSequence = parseInt(firstSerialNumber.substring(7, 10)); // Digits 8-10
+  // First 10 digits from the input (ignore the check digit, we'll recalculate)
+  const startingBase = firstSerialNumber.substring(0, 10);
 
   const serialNumbers: string[] = [];
 
   for (let i = 0; i < 50; i++) {
-    const sequenceNum = startingSequence + i;
-    const sequenceStr = sequenceNum.toString().padStart(3, '0');
-    const first10 = prefix + sequenceStr;
-    const checkDigit = calculateCheckDigit(first10);
-    serialNumbers.push(first10 + checkDigit);
+    // Increment the first 10 digits by i
+    const baseNumber = (parseInt(startingBase) + i).toString().padStart(10, '0');
+    const checkDigit = calculateCheckDigit(baseNumber);
+    serialNumbers.push(baseNumber + checkDigit);
   }
 
   return serialNumbers;
